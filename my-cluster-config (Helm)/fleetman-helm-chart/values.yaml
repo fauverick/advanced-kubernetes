@@ -1,0 +1,9 @@
+webapp:
+  numberOfWebAppReplicas: 1
+  nodePort: 30080
+
+dockerRepoName: richardchesterwood
+
+# environment: prod
+
+development: true

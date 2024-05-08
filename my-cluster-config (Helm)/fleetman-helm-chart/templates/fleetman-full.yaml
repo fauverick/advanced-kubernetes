@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-webapp #so that the pod names will start with the helm release name in helm install release-name .
+spec:
+  selector:
+    matchLabels:
+      app: webapp
+  replicas: {{ .Values.webapp.numberOfWebAppReplicas }}
+  template: # template for the pods
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      {{- include "webAppImage" . | indent 6}}  
+      #. means that we dont add any prefix to the webAppImage variable (like we dont put anything before .Values)
+      # - removes white spaces (a full line is normally added) when the template is added 
+      # indent means the block will be indented 6 spaces
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Release.Name}}-fleetman-webapp
+
+spec:
+  selector:
+    app: webapp
+
+  ports:
+    - name: http
+      port: 80
+      nodePort: {{.Values.webapp.nodePort}}
+
+  type: NodePort

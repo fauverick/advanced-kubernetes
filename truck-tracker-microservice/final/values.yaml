@@ -1,0 +1,8 @@
+grafana:
+  adminPassword: admin
+  service:
+    portName: service
+    type: NodePort
+    nodePort: 30001
+
+ 

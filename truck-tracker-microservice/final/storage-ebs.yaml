@@ -1,0 +1,28 @@
+#What we want
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  storageClassName: cloud-ssd
+  accessModes: #mandatory field
+    - ReadWriteOnce #the accessMode that we're gonna use 99% of the time, allowing the volume to be read and write by a single node
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+
+#How we want it to be implemented
+
+# copy from the k8s storage class ebs documentation
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: cloud-ssd
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+

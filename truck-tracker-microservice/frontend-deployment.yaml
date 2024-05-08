@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-webapp
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend-webapp
+          image: richardchesterwood/k8s-fleetman-webapp-angular:release1
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: production-microservice 

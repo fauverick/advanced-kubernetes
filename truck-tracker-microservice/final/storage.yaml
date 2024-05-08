@@ -1,0 +1,32 @@
+#What we want
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  storageClassName: mylocalstorage
+  accessModes: #mandatory field
+    - ReadWriteOnce #the accessMode that we're gonna use 99% of the time, allowing the volume to be read and write by a single node
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+
+#How we want it to be implemented
+#the pvc will find the persistent volume that has the matching storageClassName, accessMode and sufficient storage
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: local-storage
+spec:
+  storageClassName: mylocalstorage
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 5Gi  #must be at least the ammount of storage required in the pvc aka at least 5gb
+  hostPath:
+    path: "/mnt/some/directory/structure"
+    type: DirectoryOrCreate

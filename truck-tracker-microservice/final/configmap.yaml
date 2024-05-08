@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+
+  #since k8s doesnt automatically update the running pod when we change the value of a configmap
+  #so each time we wanna change something, we need to also change the name of the configmap here and inside the workoad.yaml 
+
+  name: global-database-config-v2
+  namespace: default
+data:
+  # DATABASE_URL: "https://dbserver.com.somewhere"
+  # DATABASE_PASSWORD: "12345"
+
+  #if we use mount configMap, its recommended to combine all key into a long string and add that to a properties key
+  # otherwise, each key-value will be a seperate file in the pod
+
+  database.properties: |
+    database.url = https://dbserver.com.somewhere
+    database.password = 12345

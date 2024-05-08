@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:4.4.29-focal
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db #the folder inside the container that we want to mount to the host system (the virtual machine that the k8s clusters run on) or an aws ebs
+      volumes:
+        - name: mongo-persistent-storage
+          # hostPath:  #hostPath is for local development, if we wanna move to cloud, change this to amazonebs or azurefile ... (look up the k8s documentation)
+          #   path: /mnt/some/directory/structure
+          #   type: DirectoryOrCreate # (means create an empty folder if the directory doesnt exist)
+
+          #instead of hard-coding the hostPath like above, we're gonna use the Persistent Volume Claim
+          # (kinda a pointer to the configuration of how we want the mount to be implemented)
+          # this is important in case we wanna change the mount from local to cloud, or change from aws to azure, we dont need to edit the pod definition. 
+          # in that case, we can just create a new claim
+
+          persistentVolumeClaim:
+            claimName: mongo-pvc #refer to the name of the pvc in storage.yaml
+

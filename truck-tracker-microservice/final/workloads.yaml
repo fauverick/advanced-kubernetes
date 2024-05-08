@@ -1,0 +1,137 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue
+  labels:
+    app: queue # this queue and the queue above are just information
+#the labels down here are the labels for the pods, the labels up there are the labels for the Deployment Set (or Replic Set, or Daemeon Set ... depending on the kind)
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: queue
+  template:
+    metadata:
+      labels:
+        app: queue  #this queue match the right above matchLabels: app: queue
+    spec:
+      containers:
+        - name: activemq
+          image: richardchesterwood/k8s-fleetman-queue:release2
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: production-microservice 
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: position-simulator
+  labels:
+    app: pos-sim
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pos-sim
+  template:
+    metadata:
+      labels:
+        app: pos-sim
+    spec:
+      containers:
+      - name: position-simulation
+        image: richardchesterwood/k8s-fleetman-position-simulator:release2
+        env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: production-microservice 
+
+        
+        #another way is directly use env variables in the configMap 
+        
+        #mounting a config file to the mountPath directory inside the pod
+        #cd to the mountPath directory to see the configMap files (each key-value pair in configMap is a file)
+        volumeMounts:
+          - name: database-config-volume
+            mountPath: /etc/any/directory
+      
+      #normally we will mount a file/directory in our local computer or an ebs volume, but here we mount a configMap
+      volumes:
+      - name: database-config-volume
+        configMap:
+          name: global-database-config-v2
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: position-tracker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: position-tracker
+  template:
+    metadata:
+      labels:
+        app: position-tracker
+    spec:
+      containers:
+        - name: position-tracker
+          image: richardchesterwood/k8s-fleetman-position-tracker:release3
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: production-microservice 
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-dep
+  labels:
+    app: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: richardchesterwood/k8s-fleetman-api-gateway:release2
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: production-microservice 
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-webapp
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend-webapp
+          image: richardchesterwood/k8s-fleetman-webapp-angular:release2
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: production-microservice 
